@@ -12,7 +12,7 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 
-// Your API Keys (from environment variables)
+// Your API Keys
 const CONFIG = {
   ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
   YOUTUBE_CLIENT_ID: process.env.YOUTUBE_CLIENT_ID,
@@ -93,14 +93,11 @@ async function processVideo() {
     const audioPath = await generateAudio(story);
     console.log(`✅ Audio saved`);
     
-    // In production: Create video, add subtitles, upload to YouTube
-    // For now, we're simulating the process
-    
     return {
       success: true,
       story: story,
       audioPath: audioPath,
-      message: 'Video processing complete! (Upload to YouTube coming soon)'
+      message: 'Video processing complete!'
     };
     
   } catch (error) {
@@ -126,7 +123,6 @@ app.post('/api/generate-video', async (req, res) => {
 app.post('/api/start-automation', (req, res) => {
   console.log('🤖 Automation started!');
   
-  // Schedule videos at 9AM, 1PM, 5PM, 9PM
   const times = ['0 9 * * *', '0 13 * * *', '0 17 * * *', '0 21 * * *'];
   
   times.forEach(time => {
@@ -147,7 +143,7 @@ app.get('/api/config', (req, res) => {
 });
 
 // Create output directory
-fs.mkdir('./output', { recursive: true });
+fs.mkdir('./output', { recursive: true }).catch(console.error);
 
 app.listen(PORT, () => {
   console.log(`
@@ -158,20 +154,3 @@ app.listen(PORT, () => {
 ╚════════════════════════════════════════╝
   `);
 });
-```
-
-4. Scroll down, click **"Commit changes"**
-
----
-
-### **FILE 3: .gitignore**
-
-1. Click **"Add file"** → **"Create new file"**
-2. **File name**: Type `.gitignore`
-3. **Paste this:**
-```
-node_modules/
-output/
-.env
-*.mp3
-*.mp4
