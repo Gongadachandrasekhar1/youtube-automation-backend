@@ -100,6 +100,7 @@ async function processVideo() {
     try {
           const story = await generateStory();
           console.log(`✅ Story: ${story.title_english} (${story.category})`);
+      }
     const audioPath = await generateAudio(story);
           console.log(`✅ Audio saved: ${audioPath}`);
     
