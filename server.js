@@ -88,23 +88,20 @@ async function generateAudio(story) {
   console.log('🎤 Generating Telugu audio...');
   
   const fullScript = story.scenes.map(s => s.telugu_dialogue).join(' ');
-async function generateAudio(story) {
-  console.log('🎤 Generating Telugu audio...');
-  
-  const fullScript = story.scenes.map(s => s.telugu_dialogue).join(' ');
-  const outputPath = `./output/audio_${Date.now()}.mp3`;
-  
-  // Temporary: Return success without actual audio generation
-  // TODO: Integrate proper Telugu TTS (options: Google Cloud TTS, AWS Polly, or ElevenLabs)
-  console.log('✅ Audio placeholder created (TTS integration pending)');
-  console.log('Telugu script:', fullScript.substring(0, 100) + '...');
-  
-  return outputPath;
-}    const story = await generateStory();
-    console.log(`✅ Story: ${story.title_english} (${story.category})`);
-    
+    const outputPath = `./output/audio_${Date.now()}.mp3`;
+
+    // Temporary: Return success without actual audio generation
+    // TODO: Integrate proper Telugu TTS (options: Google Cloud TTS, AWS Polly, or ElevenLabs)
+    console.log('✅ Audio placeholder created (TTS integration pending)');
+    console.log('Telugu script:', fullScript.substring(0, 100) + '...');
+
+    return outputPath;
+async function processVideo() {
+    try {
+          const story = await generateStory();
+          console.log(`✅ Story: ${story.title_english} (${story.category})`);
     const audioPath = await generateAudio(story);
-    console.log(`✅ Audio saved: ${audioPath}`);
+          console.log(`✅ Audio saved: ${audioPath}`);
     
     return {
       success: true,
