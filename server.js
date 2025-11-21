@@ -218,14 +218,3 @@ app.listen(PORT, () => {
   console.log('- Gemini API Key:', CONFIG.GEMINI_API_KEY ? '✅ Set' : '❌ Missing');
   console.log('- YouTube Client ID:', CONFIG.YOUTUBE_CLIENT_ID ? '✅ Set' : '❌ Missing');
 });
-```
-
----
-
-## ✅ **AFTER COMMITTING:**
-
-1. **Commit the changes**
-2. Wait 2 minutes
-3. **Open this URL in your browser:**
-```
-https://youtube-automation-2zba.onrender.com/api/list-models
