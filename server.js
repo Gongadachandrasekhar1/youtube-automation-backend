@@ -1,3 +1,4 @@
+// Updated for Render deployment
 const express = require('express');
 const cors = require('cors');
 const cron = require('node-cron');
