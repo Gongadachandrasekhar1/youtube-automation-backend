@@ -26,7 +26,7 @@ async function generateStory() {
 
   const prompt = `Create a ${randomType} Telugu story for YouTube (5-7 minutes, family audience).
 
-Return ONLY valid JSON with this exact structure:
+Return ONLY valid JSON:
 {
   "title_telugu": "Story title in Telugu",
   "title_english": "Story title in English",
@@ -34,23 +34,23 @@ Return ONLY valid JSON with this exact structure:
   "scenes": [
     {
       "scene_number": 1,
-      "telugu_dialogue": "First scene dialogue in Telugu",
+      "telugu_dialogue": "First scene in Telugu",
       "english_translation": "English translation",
-      "action": "What happens in this scene",
+      "action": "Scene description",
       "duration_seconds": 20
     },
     {
       "scene_number": 2,
-      "telugu_dialogue": "Second scene dialogue in Telugu",
+      "telugu_dialogue": "Second scene in Telugu",
       "english_translation": "English translation",
-      "action": "What happens in this scene",
+      "action": "Scene description",
       "duration_seconds": 20
     }
   ],
-  "moral": "The moral or lesson of the story",
-  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
-  "description": "YouTube video description with hashtags",
-  "thumbnail_text": "Short text for thumbnail"
+  "moral": "The lesson",
+  "tags": ["tag1", "tag2", "tag3"],
+  "description": "YouTube description",
+  "thumbnail_text": "Thumbnail text"
 }`;
 
   try {
@@ -135,8 +135,18 @@ app.get('/', (req, res) => {
     status: 'running',
     message: 'YouTube Automation Backend - Gemini Powered!',
     videosPerDay: CONFIG.VIDEOS_PER_DAY,
-    aiProvider: 'Google Gemini 1.5 Flash (FREE)'
+    aiProvider: 'Google Gemini (FREE)'
   });
+});
+
+app.get('/api/list-models', async (req, res) => {
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${CONFIG.GEMINI_API_KEY}`);
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    res.json({ error: error.message });
+  }
 });
 
 app.post('/api/generate-video', async (req, res) => {
@@ -167,7 +177,7 @@ app.get('/api/config', (req, res) => {
   res.json({
     configured: !!(CONFIG.GEMINI_API_KEY && CONFIG.YOUTUBE_CLIENT_ID),
     channelId: CONFIG.CHANNEL_ID,
-    aiProvider: 'Google Gemini 1.5 Flash',
+    aiProvider: 'Google Gemini',
     hasGeminiKey: !!CONFIG.GEMINI_API_KEY,
     hasYouTubeKeys: !!(CONFIG.YOUTUBE_CLIENT_ID && CONFIG.YOUTUBE_CLIENT_SECRET)
   });
@@ -175,7 +185,7 @@ app.get('/api/config', (req, res) => {
 
 app.get('/api/test-gemini', async (req, res) => {
   try {
-    const testResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${CONFIG.GEMINI_API_KEY}`, {
+    const testResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${CONFIG.GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -198,7 +208,7 @@ app.listen(PORT, () => {
   console.log(`
 ╔════════════════════════════════════════╗
 ║  YouTube Automation Backend           ║
-║  AI: Google Gemini 1.5 Flash (FREE)   ║
+║  AI: Google Gemini (FREE)             ║
 ║  Port: ${PORT}                            ║
 ║  Status: ✅ Running                    ║
 ╚════════════════════════════════════════╝
@@ -208,3 +218,14 @@ app.listen(PORT, () => {
   console.log('- Gemini API Key:', CONFIG.GEMINI_API_KEY ? '✅ Set' : '❌ Missing');
   console.log('- YouTube Client ID:', CONFIG.YOUTUBE_CLIENT_ID ? '✅ Set' : '❌ Missing');
 });
+```
+
+---
+
+## ✅ **AFTER COMMITTING:**
+
+1. **Commit the changes**
+2. Wait 2 minutes
+3. **Open this URL in your browser:**
+```
+https://youtube-automation-2zba.onrender.com/api/list-models
