@@ -1,10 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const cron = require('node-cron');
-const Anthropic = require('@anthropic-ai/sdk');
 const gtts = require('gtts');
 const fs = require('fs').promises;
-const path = require('path');
 
 const app = express();
 app.use(cors());
@@ -12,32 +10,24 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 
-// Your API Keys
 const CONFIG = {
-  ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY || 'AIzaSyC9slVxTAEXhqXiqexm5b-NOCVGpMzG7Dw',
   YOUTUBE_CLIENT_ID: process.env.YOUTUBE_CLIENT_ID,
   YOUTUBE_CLIENT_SECRET: process.env.YOUTUBE_CLIENT_SECRET,
   CHANNEL_ID: process.env.CHANNEL_ID,
   VIDEOS_PER_DAY: 4
 };
 
-// Story generation
+// Generate story using Google Gemini
 async function generateStory() {
-  console.log('📝 Generating Telugu story...');
-  
-  const client = new Anthropic({ apiKey: CONFIG.ANTHROPIC_API_KEY });
+  console.log('📝 Generating Telugu story with Gemini...');
   
   const storyTypes = ['moral', 'funny', 'educational', 'mythology'];
   const randomType = storyTypes[Math.floor(Math.random() * storyTypes.length)];
 
-  const message = await client.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 2500,
-    messages: [{
-      role: 'user',
-      content: `Create a ${randomType} Telugu story for YouTube (5-7 minutes, family audience, 3D avatar style).
+  const prompt = `Create a ${randomType} Telugu story for YouTube (5-7 minutes, family audience, 3D avatar style).
 
-Return ONLY valid JSON:
+Return ONLY valid JSON (no markdown, no extra text):
 {
   "title_telugu": "Telugu title",
   "title_english": "English title",
@@ -51,16 +41,32 @@ Return ONLY valid JSON:
       "duration_seconds": 15
     }
   ],
-  "moral": "Story moral",
+  "moral": "Story moral in English",
   "tags": ["tag1", "tag2", "tag3"],
   "description": "YouTube description",
   "thumbnail_text": "Thumbnail text"
-}`
-    }]
+}`;
+
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${CONFIG.GEMINI_API_KEY}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{
+        parts: [{ text: prompt }]
+      }]
+    })
   });
 
-  const text = message.content[0].text.replace(/```json|```/g, '').trim();
-  return JSON.parse(text);
+  const data = await response.json();
+  
+  if (!data.candidates || !data.candidates[0]) {
+    throw new Error('Gemini API error: ' + JSON.stringify(data));
+  }
+  
+  const text = data.candidates[0].content.parts[0].text;
+  const cleanText = text.replace(/```json|```/g, '').trim();
+  
+  return JSON.parse(cleanText);
 }
 
 // Generate audio using gTTS
@@ -110,7 +116,7 @@ async function processVideo() {
 app.get('/', (req, res) => {
   res.json({ 
     status: 'running',
-    message: 'YouTube Automation Backend is running!',
+    message: 'YouTube Automation Backend - Gemini Powered!',
     videosPerDay: CONFIG.VIDEOS_PER_DAY
   });
 });
@@ -137,8 +143,9 @@ app.post('/api/start-automation', (req, res) => {
 
 app.get('/api/config', (req, res) => {
   res.json({
-    configured: !!(CONFIG.ANTHROPIC_API_KEY && CONFIG.YOUTUBE_CLIENT_ID),
-    channelId: CONFIG.CHANNEL_ID
+    configured: !!(CONFIG.GEMINI_API_KEY && CONFIG.YOUTUBE_CLIENT_ID),
+    channelId: CONFIG.CHANNEL_ID,
+    aiProvider: 'Google Gemini (FREE)'
   });
 });
 
@@ -149,6 +156,7 @@ app.listen(PORT, () => {
   console.log(`
 ╔════════════════════════════════════════╗
 ║  YouTube Automation Backend           ║
+║  AI: Google Gemini (FREE)             ║
 ║  Port: ${PORT}                            ║
 ║  Status: ✅ Running                    ║
 ╚════════════════════════════════════════╝
