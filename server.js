@@ -118,6 +118,7 @@ async function processVideo() {
       details: error.toString()
     };
   }
+  }
 }
 
 app.get('/', (req, res) => {
