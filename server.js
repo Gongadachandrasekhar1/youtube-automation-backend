@@ -90,21 +90,31 @@ async function generateAudio(story) {
   const fullScript = story.scenes.map(s => s.telugu_dialogue).join(' ');
   const outputPath = `./output/audio_${Date.now()}.mp3`;
   
-  return new Promise((resolve, reject) => {
-    const tts = new gtts(fullScript, 'te');
-    tts.save(outputPath, (err) => {
-      if (err) {
-        console.error('Audio generation error:', err);
-        reject(err);
-      } else {
-        console.log('✅ Audio generated');
-        resolve(outputPath);
+  try {
+    // Use Google Translate TTS API directly (FREE & supports Telugu)
+    const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=te&client=tw-ob&q=${encodeURIComponent(fullScript)}`;
+    
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0'
       }
     });
-  });
-}
-
-async function processVideo() {
+    
+    if (!response.ok) {
+      throw new Error(`TTS API error: ${response.statusText}`);
+    }
+    
+    const buffer = await response.arrayBuffer();
+    await fs.writeFile(outputPath, Buffer.from(buffer));
+    
+    console.log('✅ Audio generated');
+    return outputPath;
+    
+  } catch (error) {
+    console.error('Audio generation error:', error);
+    throw error;
+  }
+}async function processVideo() {
   try {
     console.log('🚀 Starting video generation...');
     
