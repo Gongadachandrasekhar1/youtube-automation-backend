@@ -54,8 +54,7 @@ Return ONLY valid JSON:
 
   try {
     const response = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${CONFIG.HUGGINGFACE_API_TOKEN}` },      body: JSON.stringify({
-      body: JSON.stringify({ inputs: prompt, parameters: { max_new_tokens: 1500, return_full_text: false, temperature: 0.7 } }) );
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${CONFIG.HUGGINGFACE_API_TOKEN}` },      body: JSON.stringify({ inputs: prompt, parameters: { max_new_tokens: 1500, return_full_text: false, temperature: 0.7 } })});
     const data = await response.json();
     
       // Parse Hugging Face response
