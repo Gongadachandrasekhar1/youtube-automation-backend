@@ -74,7 +74,6 @@ Return ONLY valid JSON:
     
     const cleanText = jsonMatch[0];
     console.log('✅ Story generated successfully with Hugging Face');
-    }
 
     return JSON.parse(cleanText);
     
