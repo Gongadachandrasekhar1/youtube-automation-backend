@@ -64,8 +64,7 @@ Return ONLY valid JSON:
           max_tokens: 1500
         })
       });
-      });if (!response.ok) {
-      const errorText = await response.text();
+      );       if (!response.ok) {      const errorText = await response.text();
       console.error('Hugging Face API error:', response.status, errorText);
       throw new Error(`Hugging Face API error (${response.status}): ${errorText}`);
     }
