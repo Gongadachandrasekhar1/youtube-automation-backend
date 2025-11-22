@@ -12,7 +12,7 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
 const CONFIG = {
-  HUGGINGFACE_API_TOKEN: process.env.HUGGINGFACE_API_TOKEN || 'AIzaSyC9slVxTAEXhqXiqexm5b-NOCVGpMzG7Dw',
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY || 'AIzaSyC9slVxTAEXhqXiqexm5b-NOCVGpMzG7Dw',
   YOUTUBE_CLIENT_ID: process.env.YOUTUBE_CLIENT_ID,
   YOUTUBE_CLIENT_SECRET: process.env.YOUTUBE_CLIENT_SECRET,
   CHANNEL_ID: process.env.CHANNEL_ID,
@@ -20,8 +20,7 @@ const CONFIG = {
 };
 
 async function generateStory() {
-  console.log('📝 Generating Telugu story with Hugging Face...');
-  
+  console.log('📝 Generating Telugu story with Gemini...');  
   const storyTypes = ['moral', 'funny', 'educational', 'mythology'];
   const randomType = storyTypes[Math.floor(Math.random() * storyTypes.length)];
 
@@ -55,27 +54,24 @@ Return ONLY valid JSON:
 }`;
 
   try {
-    const response const response = await fetch('https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1', {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`, {
       method: 'POST',
-      headers: { 
-        'Authorization': `Bearer ${CONFIG.HUGGINGFACE_API_TOKEN}`,
-        'Content-Type': 'application/json' 
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        inputs: prompt,
-        parameters: { max_new_tokens: 2000, temperature: 0.7, return_full_text: false }
+        contents: [{
+          parts: [{ text: prompt }]
+        }]
       })
     });
     const data = await response.json();
     
     if (!response.ok || data.error) {
-      console.error('Hugging Face API error:', data);
-      throw new Error('Hugging Face API error: ' + JSON.stringify(data));
+      console.error('Gemini API error:', data);      
+      throw new Error('Gemini API error: ' + JSON.stringify(data));
     }
 
-    const text = Array.isArray(data) ? data[0].generated_text : data.generated_text;
-    const cleanText = text.replace(/```json```/g, '').trim()
-    
+    const text = data.candidates[0].content.parts[0].text;
+    const cleanText = text.replace(/```json|```/g, '').trim();    
     console.log('✅ Story generated successfully');
     return JSON.parse(cleanText);
     
@@ -168,17 +164,17 @@ app.post('/api/start-automation', (req, res) => {
 
 app.get('/api/config', (req, res) => {
   res.json({
-    configured: !!(CONFIG.HUGGINGFACE_API_TOKEN && CONFIG.YOUTUBE_CLIENT_ID),
+    configured: !!(CONFIG.GEMINI_API_KEY && CONFIG.YOUTUBE_CLIENT_ID),
     channelId: CONFIG.CHANNEL_ID,
     aiProvider: 'Google Gemini',
-    hasGeminiKey: !!CONFIG.HUGGINGFACE_API_TOKEN,
+    hasGeminiKey: !!CONFIG.GEMINI_API_KEY,
     hasYouTubeKeys: !!(CONFIG.YOUTUBE_CLIENT_ID && CONFIG.YOUTUBE_CLIENT_SECRET)
   });
 });
 
 app.get('/api/test-gemini', async (req, res) => {
   try {
-    const testResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${CONFIG.HUGGINGFACE_API_TOKEN}`, {
+    const testResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -208,6 +204,6 @@ app.listen(PORT, () => {
   `);
   
   console.log('Configuration:');
-  console.log('- Gemini API Key:', CONFIG.HUGGINGFACE_API_TOKEN ? '✅ Set' : '❌ Missing');
+  console.log('- Gemini API Key:', CONFIG.GEMINI_API_KEY ? '✅ Set' : '❌ Missing');
   console.log('- YouTube Client ID:', CONFIG.YOUTUBE_CLIENT_ID ? '✅ Set' : '❌ Missing');
 });
