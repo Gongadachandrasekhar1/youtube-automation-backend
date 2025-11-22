@@ -53,18 +53,17 @@ Return ONLY valid JSON:
 }`;
 
   try {
-      const response = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {        method: 'POST',
+      const response = await fetch('https://router.huggingface.co/v1/chat/completions     method: 'POST',
         headers: { 
           'Content-Type': 'application/json', 
           'Authorization': `Bearer ${CONFIG.HUGGINGFACE_API_TOKEN}` 
         },
         body: JSON.stringify({
-          inputs: prompt,
-          parameters: {
-            max_new_tokens: 1500,
-            return_full_text: false
-          }
+          model: 'mistralai/Mistral-7B-Instruct-v0.2',
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 1500
         })
+      });
       });if (!response.ok) {
       const errorText = await response.text();
       console.error('Hugging Face API error:', response.status, errorText);
@@ -80,8 +79,7 @@ Return ONLY valid JSON:
     }
 
     // Extract the generated text
-     const generatedText = data[0]?.generated_text || '';    // Try to extract JSON from the response
-    let jsonMatch = generatedText.match(/\{[\s\S]*\}/); 
+     const generatedText = data.choices?.[0]?.message?.content || '';  // Try to extract JSON from the response    let jsonMatch = generatedText.match(/\{[\s\S]*\}/); 
     if (!jsonMatch) {
       throw new Error('No valid JSON found in response');
     }
