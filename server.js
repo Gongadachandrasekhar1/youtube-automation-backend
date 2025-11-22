@@ -53,11 +53,18 @@ Return ONLY valid JSON:
 }`;
 
   try {
-    const response = await fetch('https://router.huggingface.co/v1/chat/completions', {  method: 'POST',      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${CONFIG.HUGGINGFACE_API_TOKEN}` },      body: JSON.stringify({ inputs: prompt, parameters: { max_new_tokens: 1500, return_full_text: false, temperature: 0.7 } })});
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${CONFIG.HUGGINGFACE_API_TOKEN}` },    // Check response status before parsing JSON
-          body: JSON.stringify({ model: 'mistralai/Mistral-7B-Instruct-v0.2', messages: [{ role: 'user', content: prompt }], max_tokens: 1500 )})
-        });
-    if (!response.ok) {
+    const response = await fetch('https://router.huggingface.co/v1/chat/completions', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json', 
+          'Authorization': `Bearer ${CONFIG.HUGGINGFACE_API_TOKEN}` 
+        },
+        body: JSON.stringify({
+          model: 'mistralai/Mistral-7B-Instruct-v0.2',
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 1500
+        })
+      });if (!response.ok) {
       const errorText = await response.text();
       console.error('Hugging Face API error:', response.status, errorText);
       throw new Error(`Hugging Face API error (${response.status}): ${errorText}`);
