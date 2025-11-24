@@ -14,6 +14,7 @@ const PORT = process.env.PORT || 3000;
 const CONFIG = {
   GEMINI_API_KEY: process.env.GEMINI_API_KEY || 'hf_...SMES',  YOUTUBE_CLIENT_ID: process.env.YOUTUBE_CLIENT_ID,
   GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+    HUGGINGFACE_API_TOKEN: process.env.HUGGINGFACE_API_TOKEN,
   YOUTUBE_CLIENT_SECRET: process.env.YOUTUBE_CLIENT_SECRET,
   CHANNEL_ID: process.env.CHANNEL_ID,
   VIDEOS_PER_DAY: 4
@@ -58,8 +59,7 @@ Return ONLY valid JSON:
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${CONFIG.GEMINI_API_KEY}`
-        },
+        'Authorization': `Bearer ${CONFIG.HUGGINGFACE_API_TOKEN}`        },
         body: JSON.stringify({
           model: "mistralai/Mistral-7B-Instruct-v0.2",
           messages: [{ role: 'user', content: prompt }],
