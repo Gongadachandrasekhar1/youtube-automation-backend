@@ -12,7 +12,8 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
 const CONFIG = {
-  HUGGINGFACE_API_TOKEN: process.env.HUGGINGFACE_API_TOKEN || 'hf_...SMES',  YOUTUBE_CLIENT_ID: process.env.YOUTUBE_CLIENT_ID,
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY || 'hf_...SMES',  YOUTUBE_CLIENT_ID: process.env.YOUTUBE_CLIENT_ID,
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY,
   YOUTUBE_CLIENT_SECRET: process.env.YOUTUBE_CLIENT_SECRET,
   CHANNEL_ID: process.env.CHANNEL_ID,
   VIDEOS_PER_DAY: 4
@@ -57,7 +58,7 @@ Return ONLY valid JSON:
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${CONFIG.HUGGINGFACE_API_TOKEN}`
+          'Authorization': `Bearer ${CONFIG.GEMINI_API_KEY}`
         },
         body: JSON.stringify({
           model: "mistralai/Mistral-7B-Instruct-v0.2",
@@ -144,7 +145,7 @@ app.get('/', (req, res) => {
 
 app.get('/api/list-models', async (req, res) => {
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${CONFIG.HUGGINGFACE_API_TOKEN}`);
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${CONFIG.GEMINI_API_KEY}`);
     const data = await response.json();
     res.json(data);
   } catch (error) {
@@ -217,5 +218,5 @@ app.listen(PORT, () => {
   `);
   
   console.log('Configuration:');
-  console.log('- Hugging Face API Key:', CONFIG.HUGGINGFACE_API_TOKEN ? '✅ Set' : '❌ Missing');  console.log('- YouTube Client ID:', CONFIG.YOUTUBE_CLIENT_ID ? '✅ Set' : '❌ Missing');
+  console.log('- Hugging Face API Key:', CONFIG.GEMINI_API_KEY ? '✅ Set' : '❌ Missing');  console.log('- YouTube Client ID:', CONFIG.YOUTUBE_CLIENT_ID ? '✅ Set' : '❌ Missing');
 });
